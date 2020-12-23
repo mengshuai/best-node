@@ -71,7 +71,7 @@ exports.login = (req, res) => {
     .then((userInfo) => {
       if (userInfo) {
         //登录成功后设置session
-        req.session.userInfo = userInfo;
+        // req.session.userInfo = userInfo;
         responseClient(res, 200, 0, "登录成功", userInfo);
       } else {
         responseClient(res, 400, 1, "用户名或者密码错误");
