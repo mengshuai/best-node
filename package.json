@@ -1,0 +1,30 @@
+{
+  "name": "best-node",
+  "version": "1.0.0",
+  "description": "后端服务搭建",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/www"
+  },
+  "keywords": [
+    "node",
+    "mongodb",
+    "service"
+  ],
+  "author": "mengshuai93@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "config": "^3.3.3",
+    "consola": "^2.15.0",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.11.8",
+    "mongoose-auto-increment": "^5.0.1",
+    "node-fetch": "^2.6.1",
+    "yargs": "^16.2.0"
+  }
+}
