@@ -71,7 +71,7 @@ exports.login = (req, res) => {
     .then((userInfo) => {
       if (userInfo) {
         //登录成功后设置session
-        // req.session.userInfo = userInfo;
+        req.session.userInfo = userInfo;
         responseClient(res, 200, 0, "登录成功", userInfo);
       } else {
         responseClient(res, 400, 1, "用户名或者密码错误");
@@ -81,25 +81,11 @@ exports.login = (req, res) => {
       responseClient(res);
     });
 };
-//后台当前用户
+//用户验证
 exports.currentUser = (req, res) => {
-  let user = {};
-  user.avatar = "http://p61te2jup.bkt.clouddn.com/WechatIMG8.jpeg";
-  user.notifyCount = 0;
-  user.address = "广东省";
-  user.country = "China";
-  user.group = "BiaoChenXuying";
-  (user.title = "交互专家"), (user.signature = "海纳百川，有容乃大");
-  user.tags = [];
-  user.geographic = {
-    province: {
-      label: "广东省",
-      key: "330000",
-    },
-    city: {
-      label: "广州市",
-      key: "330100",
-    },
-  };
-  responseClient(res, 200, 0, "", user);
+  if (req.session.userInfo) {
+    responseClient(res, 200, 0, "", req.session.userInfo);
+  } else {
+    responseClient(res, 200, 1, "请重新登录", req.session.userInfo);
+  }
 };
