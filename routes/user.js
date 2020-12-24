@@ -2,7 +2,7 @@ const User = require("../models/user");
 const consola = require("consola");
 
 import { MD5_SUFFIX, responseClient, md5 } from "../utils/helper.js";
-
+//用户注册
 exports.register = (req, res) => {
   // req的数据格式
   consola.warn("req content-type:", req.headers["content-type"]);
@@ -54,6 +54,7 @@ exports.register = (req, res) => {
       return;
     });
 };
+//用户登录
 exports.login = (req, res) => {
   let { email, password } = req.body || {};
   if (!email) {
@@ -81,11 +82,123 @@ exports.login = (req, res) => {
       responseClient(res);
     });
 };
+//退出登录
+exports.logout = (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
+};
 //用户验证
 exports.currentUser = (req, res) => {
-  if (req.session.userInfo) {
-    responseClient(res, 200, 0, "", req.session.userInfo);
+  const reqUserInfo = req.session.userInfo;
+  const { email } = reqUserInfo;
+  if (reqUserInfo) {
+    User.findOne({
+      email,
+    })
+      .then((userInfo) => {
+        if (userInfo) {
+          responseClient(res, 200, 0, "", userInfo);
+        } else {
+          responseClient(res, 200, 1, "请重新登录", reqUserInfo);
+        }
+      })
+      .catch((err) => {
+        responseClient(res);
+      });
   } else {
-    responseClient(res, 200, 1, "请重新登录", req.session.userInfo);
+    responseClient(res, 200, 1, "请重新登录", reqUserInfo);
   }
+};
+//获取用户列表
+exports.getUserList = (req, res) => {
+  let keyword = req.query.keyword || "";
+  let pageNum = parseInt(req.query.pageNum) || 1;
+  let pageSize = parseInt(req.query.pageSize) || 10;
+  let conditions = {};
+  if (keyword) {
+    const reg = new RegExp(keyword, "i");
+    conditions = {
+      $or: [{ name: { $regex: reg } }, { email: { $regex: reg } }],
+    };
+  }
+  let skip = pageNum - 1 < 0 ? 0 : (pageNum - 1) * pageSize;
+  let responseData = {
+    count: 0,
+    list: [],
+  };
+  User.countDocuments({}, (err, count) => {
+    if (err) {
+      console.error("Error:" + err);
+    } else {
+      responseData.count = count;
+      // 待返回的字段
+      let fields = {
+        _id: 1,
+        email: 1,
+        name: 1,
+        avatar: 1,
+        phone: 1,
+        introduce: 1,
+        type: 1,
+        create_time: 1,
+      };
+      let options = {
+        skip: skip,
+        limit: pageSize,
+        sort: { create_time: -1 },
+      };
+      User.find(conditions, fields, options, (error, result) => {
+        if (err) {
+          console.error("Error:" + error);
+          // throw error;
+        } else {
+          responseData.list = result;
+          responseClient(res, 200, 0, "success", responseData);
+        }
+      });
+    }
+  });
+};
+
+//更新用户信息
+exports.updateUser = (req, res) => {
+  // if (!req.session.userInfo) {
+  //   responseClient(res, 200, 1, "您还没登录,或者登录信息已过期，请重新登录！");
+  //   return;
+  // }
+  let {
+    id,
+    github_id,
+    name,
+    type,
+    phone,
+    img_url,
+    email,
+    introduce,
+    avatar,
+    location,
+    password,
+  } = req.body;
+  User.update(
+    { _id: id },
+    {
+      github_id,
+      name,
+      type,
+      phone,
+      img_url,
+      email,
+      introduce,
+      avatar,
+      location,
+      password,
+    }
+  )
+    .then((result) => {
+      responseClient(res, 200, 0, "操作成功", result);
+    })
+    .catch((err) => {
+      console.error("err:", err);
+      responseClient(res);
+    });
 };
