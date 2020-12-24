@@ -73,7 +73,7 @@ exports.login = (req, res) => {
       if (userInfo) {
         //登录成功后设置session
         req.session.userInfo = userInfo;
-        responseClient(res, 200, 0, "登录成功", userInfo);
+        responseClient(res, 200, 0, "登录成功", { status: "ok", ...userInfo });
       } else {
         responseClient(res, 400, 1, "用户名或者密码错误");
       }
@@ -99,14 +99,20 @@ exports.currentUser = (req, res) => {
         if (userInfo) {
           responseClient(res, 200, 0, "", userInfo);
         } else {
-          responseClient(res, 200, 1, "请重新登录", reqUserInfo);
+          responseClient(
+            res,
+            400,
+            1,
+            `该用户「${email}」不存在请重新登录`,
+            reqUserInfo
+          );
         }
       })
       .catch((err) => {
         responseClient(res);
       });
   } else {
-    responseClient(res, 200, 1, "请重新登录", reqUserInfo);
+    responseClient(res, 400, 1, "请重新登录", reqUserInfo);
   }
 };
 //获取用户列表
@@ -170,7 +176,6 @@ exports.updateUser = (req, res) => {
     id,
     github_id,
     name,
-    type,
     phone,
     img_url,
     email,
@@ -178,13 +183,13 @@ exports.updateUser = (req, res) => {
     avatar,
     location,
     password,
+    currentAuthority,
   } = req.body;
   User.update(
     { _id: id },
     {
       github_id,
       name,
-      type,
       phone,
       img_url,
       email,
@@ -192,6 +197,7 @@ exports.updateUser = (req, res) => {
       avatar,
       location,
       password,
+      currentAuthority,
     }
   )
     .then((result) => {
@@ -199,6 +205,21 @@ exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       console.error("err:", err);
+      responseClient(res);
+    });
+};
+//删除用户
+exports.delUser = (req, res) => {
+  let { id } = req.body;
+  User.deleteMany({ _id: id })
+    .then((result) => {
+      if (result.n === 1) {
+        responseClient(res, 200, 0, "用户删除成功!");
+      } else {
+        responseClient(res, 200, 1, "用户不存在");
+      }
+    })
+    .catch((err) => {
       responseClient(res);
     });
 };
