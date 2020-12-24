@@ -133,14 +133,16 @@ exports.getUserList = (req, res) => {
   }
   let skip = pageNum - 1 < 0 ? 0 : (pageNum - 1) * pageSize;
   let responseData = {
-    count: 0,
+    total: 0,
     list: [],
+    current: pageNum,
+    pageSize,
   };
   User.countDocuments({}, (err, count) => {
     if (err) {
       console.error("Error:" + err);
     } else {
-      responseData.count = count;
+      responseData.total = count;
       // 待返回的字段
       let fields = {
         _id: 1,
