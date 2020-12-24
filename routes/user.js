@@ -153,6 +153,8 @@ exports.getUserList = (req, res) => {
         introduce: 1,
         type: 1,
         create_time: 1,
+        update_time: 1,
+        currentAuthority: 1,
       };
       let options = {
         skip: skip,
