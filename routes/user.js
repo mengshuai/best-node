@@ -150,6 +150,7 @@ exports.getUserList = (req, res) => {
       // 待返回的字段
       let fields = {
         _id: 1,
+        id: 1,
         email: 1,
         name: 1,
         avatar: 1,
@@ -202,25 +203,19 @@ exports.updateUser = (req, res) => {
     responseClient(res, 200, 1, "您没有权限修改其他人账号信息");
     return;
   }
-
-  User.updateOne(
-    { _id: id },
-    _.pick(
-      {
-        github_id,
-        name,
-        phone,
-        img_url,
-        email,
-        introduce,
-        avatar,
-        location,
-        password,
-        currentAuthority,
-      },
-      _.identity
-    )
-  )
+  const data = {
+    github_id,
+    name,
+    phone,
+    img_url,
+    email,
+    introduce,
+    avatar,
+    location,
+    password,
+    currentAuthority,
+  };
+  User.updateOne({ _id: id }, _.pickBy(data, _.identity))
     .then((result) => {
       responseClient(res, 200, 0, "操作成功", result);
     })
