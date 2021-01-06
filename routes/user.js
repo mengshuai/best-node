@@ -101,11 +101,10 @@ exports.currentUser = (req, res) => {
     })
       .then((userInfo) => {
         if (userInfo) {
-          responseClient(res, 200, 0, "", {
-            ...userInfo,
-            id: userInfo._id,
-            userid: userInfo._id,
-          });
+          var infoData = userInfo;
+          infoData.id = userInfo._id;
+          infoData.userid = userInfo._id;
+          responseClient(res, 200, 0, "", infoData);
         } else {
           responseClient(
             res,
