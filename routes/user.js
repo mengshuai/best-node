@@ -102,9 +102,7 @@ exports.currentUser = (req, res) => {
     })
       .then((userInfo) => {
         if (userInfo) {
-          var infoData = userInfo;
-          infoData.id = userInfo._id;
-          infoData.userid = userInfo._id;
+          var infoData = Object.assign({}, userInfo, { userid: userInfo._id });
           responseClient(res, 200, 0, "", infoData);
         } else {
           responseClient(
