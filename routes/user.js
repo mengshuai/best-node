@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const _ = require("lodash");
 const consola = require("consola");
 
 import { MD5_SUFFIX, responseClient, md5 } from "../utils/helper.js";
@@ -204,18 +205,21 @@ exports.updateUser = (req, res) => {
 
   User.updateOne(
     { _id: id },
-    {
-      github_id,
-      name,
-      phone,
-      img_url,
-      email,
-      introduce,
-      avatar,
-      location,
-      password,
-      currentAuthority,
-    }
+    _.pick(
+      {
+        github_id,
+        name,
+        phone,
+        img_url,
+        email,
+        introduce,
+        avatar,
+        location,
+        password,
+        currentAuthority,
+      },
+      _.identity
+    )
   )
     .then((result) => {
       responseClient(res, 200, 0, "操作成功", result);
