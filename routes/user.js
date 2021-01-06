@@ -94,8 +94,8 @@ exports.logout = (req, res) => {
 //用户验证
 exports.currentUser = (req, res) => {
   const reqUserInfo = req.session.userInfo;
-  const { email } = reqUserInfo;
   if (reqUserInfo) {
+    const { email } = reqUserInfo;
     User.findOne({
       email,
     })
