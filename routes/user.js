@@ -95,6 +95,7 @@ exports.logout = (req, res) => {
 //用户验证
 exports.currentUser = (req, res) => {
   const reqUserInfo = req.session.userInfo;
+  consola.warn("reqUserInfo", reqUserInfo);
   if (reqUserInfo) {
     const { email } = reqUserInfo;
     User.findOne({
@@ -102,8 +103,7 @@ exports.currentUser = (req, res) => {
     })
       .then((userInfo) => {
         if (userInfo) {
-          var infoData = Object.assign({}, userInfo, { userid: userInfo._id });
-          responseClient(res, 200, 0, "", infoData);
+          responseClient(res, 200, 0, "", userInfo);
         } else {
           responseClient(
             res,
