@@ -212,7 +212,7 @@ exports.updateUser = (req, res) => {
     introduce,
     avatar,
     location,
-    password,
+    password: password ? md5(password + MD5_SUFFIX) : undefined,
     currentAuthority,
   };
   User.updateOne({ _id: id }, _.pickBy(data, _.identity))
