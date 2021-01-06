@@ -101,7 +101,11 @@ exports.currentUser = (req, res) => {
     })
       .then((userInfo) => {
         if (userInfo) {
-          responseClient(res, 200, 0, "", userInfo);
+          responseClient(res, 200, 0, "", {
+            ...userInfo,
+            id: userInfo._id,
+            userid: userInfo._id,
+          });
         } else {
           responseClient(
             res,
@@ -176,10 +180,11 @@ exports.getUserList = (req, res) => {
 
 //更新用户信息
 exports.updateUser = (req, res) => {
-  // if (!req.session.userInfo) {
-  //   responseClient(res, 200, 1, "您还没登录,或者登录信息已过期，请重新登录！");
-  //   return;
-  // }
+  const userInfo = req.session.userInfo;
+  if (!userInfo) {
+    responseClient(res, 200, 1, "您还没登录,或者登录信息已过期，请重新登录！");
+    return;
+  }
   let {
     id,
     github_id,
@@ -193,6 +198,11 @@ exports.updateUser = (req, res) => {
     password,
     currentAuthority,
   } = req.body;
+  if (userInfo.id !== id && userInfo.currentAuthority !== "admin") {
+    responseClient(res, 200, 1, "您没有权限修改其他人账号信息");
+    return;
+  }
+
   User.updateOne(
     { _id: id },
     {
